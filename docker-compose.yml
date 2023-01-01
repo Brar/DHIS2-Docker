@@ -1,0 +1,62 @@
+version: '3'
+name: dhis2-setup
+services:
+  dhis2_db: # Use a recent tag from https://hub.docker.com/r/postgis/postgis/tags
+    image: postgis/postgis:15-3.3-alpine
+    volumes:
+      - db:/var/lib/postgresql/data
+      - ./logs/postgres:/logs
+      - ./config/postgresql.conf:/etc/postgresql/postgresql.conf
+      - ./backup/postgres:/backup
+    command: postgres -c config_file=/etc/postgresql/postgresql.conf
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-dhis2}
+      POSTGRES_USER: ${POSTGRES_USER:-dhis2}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-dhis2}
+    ports:
+      - "${DB_HOST_PORT:-5432}:5432"
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "50m"
+    restart: unless-stopped
+
+  dhis2_app: # Use a recent tag from https://hub.docker.com/r/dhis2/core/tags
+    image: dhis2/core:2.39.0.1
+    volumes:
+      - ./config/dhis.conf:/opt/dhis2/dhis.conf:ro
+      - ./logs/dhis2:/opt/dhis2/logs
+      - home:/opt/dhis2
+      - ./logs/tomcat:/usr/local/tomcat/logs
+      - ./config/logging.properties:/usr/local/tomcat/conf/logging.properties:ro
+      - ./backup/dhis2:/backup
+    environment:
+      POSTGRES_HOST: dhis2_db
+      POSTGRES_DB: ${POSTGRES_DB:-dhis2}
+      POSTGRES_USER: ${POSTGRES_USER:-dhis2}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-dhis2}
+      JAVA_OPTS: "-Xms7500m -Xmx7500m -XX:PermSize=2048m -XX:MaxPermSize=2048m"
+      CATALINA_OPTS: "-Dcontext.path="
+    depends_on:
+      - dhis2_db
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "50m"
+    restart: unless-stopped
+    ports:
+      - "${APP_HOST_PORT:-8080}:8080"
+
+  dhis2_gateway: # Use a recent tag from https://hub.docker.com/r/jwilder/nginx-proxy/tags
+    image: "jwilder/nginx-proxy:alpine"
+    restart: always
+    ports:
+      - "${GATEWAY_HOST_PORT:-8888}:80"
+    volumes:
+      - ./config/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./.apps:/data/apps:ro
+      - /var/run/docker.sock:/tmp/docker.sock:ro
+
+volumes:
+  db:
+  home:
