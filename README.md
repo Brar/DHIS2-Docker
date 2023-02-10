@@ -10,6 +10,7 @@ POSTGRES_PASSWORD=MySecretPassword
 DB_HOST_PORT=5432
 APP_HOST_PORT=8080
 GATEWAY_HOST_PORT=8888
+ENCRYPTION_PASSWORD=atleast24characterslongAmixofnumbersandloweranduppercaselettersisrecommended
 ```
 
 Run `docker-compose up` to start the containers.

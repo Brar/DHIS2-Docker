@@ -22,7 +22,7 @@ services:
     restart: unless-stopped
 
   dhis2_app: # Use a recent tag from https://hub.docker.com/r/dhis2/core/tags
-    image: dhis2/core:2.39.0.1
+    image: dhis2/core:2.39.1
     volumes:
       - ./config/dhis.conf:/opt/dhis2/dhis.conf:ro
       - ./logs/dhis2:/opt/dhis2/logs
@@ -35,6 +35,7 @@ services:
       POSTGRES_DB: ${POSTGRES_DB:-dhis2}
       POSTGRES_USER: ${POSTGRES_USER:-dhis2}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-dhis2}
+      ENCRYPTION_PASSWORD: ${ENCRYPTION_PASSWORD:-yTl93JNFThdBGyGqVqL8QwMF}
       JAVA_OPTS: "-Xms7500m -Xmx7500m -XX:PermSize=2048m -XX:MaxPermSize=2048m"
       CATALINA_OPTS: "-Dcontext.path="
     depends_on:
