@@ -22,7 +22,7 @@ services:
     restart: unless-stopped
 
   dhis2_app: # Use a recent tag from https://hub.docker.com/r/dhis2/core/tags
-    image: dhis2/core:2.39.1
+    image: dhis2/core:2.39.1.1
     volumes:
       - ./config/dhis.conf:/opt/dhis2/dhis.conf:ro
       - ./logs/dhis2:/opt/dhis2/logs
