@@ -50,7 +50,6 @@ services:
 
   dhis2_gateway: # Use a recent tag from https://hub.docker.com/r/jwilder/nginx-proxy/tags
     image: "jwilder/nginx-proxy:alpine"
-    restart: always
     ports:
       - "${GATEWAY_HOST_PORT:-8888}:80"
     volumes:
